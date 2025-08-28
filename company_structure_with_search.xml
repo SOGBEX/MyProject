@@ -1,0 +1,770 @@
+<WebPart xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.microsoft.com/WebPart/v2">
+<Title>Структура компании</Title>
+<FrameType>None</FrameType>
+<Description>Древовидная структура организации</Description>
+<IsIncluded>true</IsIncluded>
+<PartOrder>2</PartOrder>
+<FrameState>Normal</FrameState>
+<Height />
+<Width />
+<AllowRemove>true</AllowRemove>
+<AllowZoneChange>true</AllowZoneChange>
+<AllowMinimize>true</AllowMinimize>
+<AllowConnect>true</AllowConnect>
+<AllowEdit>true</AllowEdit>
+<AllowHide>true</AllowHide>
+<IsVisible>true</IsVisible>
+<DetailLink />
+<HelpLink />
+<HelpMode>Modeless</HelpMode>
+<Dir>Default</Dir>
+<PartImageSmall />
+<MissingAssembly>Невозможно импортировать эту веб-часть.</MissingAssembly>
+<PartImageLarge />
+<IsIncludedFilter />
+<ExportControlledProperties>true</ExportControlledProperties>
+<ConnectionID>00000000-0000-0000-0000-000000000000</ConnectionID>
+<ID>g_6bf57c5c_cd2d_4ba7_b085_dd361461a844</ID>
+<ContentLink xmlns="http://schemas.microsoft.com/WebPart/v2/ContentEditor" />
+<Content xmlns="http://schemas.microsoft.com/WebPart/v2/ContentEditor"><![CDATA[
+<!-- Поле поиска -->
+<div id="searchContainer" style="text-align: center; margin-bottom: 20px;">
+    <div id="searchWrapper" style="position: relative; display: inline-block; width: 400px;">
+        <input type="text" id="searchInput" placeholder="Поиск по дирекциям, департаментам и отделам..." style="width: 100%; padding: 10px; border: 2px solid #FFDF94; border-radius: 5px; font-size: 14px; box-sizing: border-box;" />
+        <div id="searchDropdown" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 2px solid #FFDF94; border-top: none; border-radius: 0 0 5px 5px; max-height: 300px; overflow-y: auto; z-index: 1001; display: none;">
+        </div>
+    </div>
+</div>
+
+<div id="treeContainer" style="text-align: center; height: 900px;"></div>
+<div id="photoTooltip" style="display:none; position:absolute; z-index:1000;">
+<img id="tooltipImage" src="" style="height: 160px; border-radius: 10px;" />
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript">
+// Глобальные переменные для поиска
+let globalHierarchy = {};
+let searchableItems = [];
+
+async function getEmployeeData() {
+const soapEnvelope = 
+'<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ' +
+'xmlns:xsd="http://www.w3.org/2001/XMLSchema" ' +
+'xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">' +
+'<soap:Body>' +
+'<GetListItems xmlns="http://schemas.microsoft.com/sharepoint/soap/">' +
+'<listName>Сотрудники СМ</listName>' +
+'<query><Query></Query></query>' +
+'<viewFields><ViewFields>' +
+'<FieldRef Name="ID"/>' +
+'<FieldRef Name="LinkTitle"/>' +
+'<FieldRef Name="_Photo"/>' +
+'</ViewFields></viewFields>' +
+'<rowLimit>500</rowLimit>' +
+'</GetListItems>' +
+'</soap:Body>' +
+'</soap:Envelope>';
+
+try {
+const response = await fetch("/_vti_bin/Lists.asmx", {
+method: "POST",
+headers: {
+"Content-Type": "text/xml; charset=utf-8",
+"SOAPAction": "http://schemas.microsoft.com/sharepoint/soap/GetListItems"
+},
+body: soapEnvelope
+});
+
+if (!response.ok) {
+throw new Error(`HTTP error! status: ${response.status}`);
+}
+
+const data = await response.text();
+return parseEmployeeData(data);
+} catch (error) {
+console.error("Error retrieving employee data: ", error);
+}
+}
+
+function parseEmployeeData(data) {
+const parser = new DOMParser();
+const xmlDoc = parser.parseFromString(data, "text/xml");
+const items = xmlDoc.getElementsByTagName("z:row");
+const employeeLinks = {};
+
+for (let i = 0; i < items.length; i++) {
+const linkTitle = items[i].getAttribute("ows_LinkTitle");
+const itemId = items[i].getAttribute("ows_ID");
+const photoUrl = items[i].getAttribute("ows__Photo");
+
+console.log(`LinkTitle: ${linkTitle}, ItemId: ${itemId}, PhotoUrl: ${photoUrl}`);
+
+if (linkTitle && itemId) {
+employeeLinks[linkTitle] = {
+link: `/Lists/Employees_synced/DispForm.aspx?ID=${itemId}`,
+photo: photoUrl
+};
+}
+}
+
+console.log("Employee Links:", employeeLinks);
+return employeeLinks;
+}
+
+async function getData() {
+const employeeLinks = await getEmployeeData();
+
+const soapEnvelope = 
+'<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ' +
+'xmlns:xsd="http://www.w3.org/2001/XMLSchema" ' +
+'xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">' +
+'<soap:Body>' +
+'<GetListItems xmlns="http://schemas.microsoft.com/sharepoint/soap/">' +
+'<listName>Структура компании</listName>' +
+'<query><Query></Query></query>' +
+'<viewFields><ViewFields>' +
+'<FieldRef Name="ID"/>' +
+'<FieldRef Name="LinkTitle"/>' +
+'<FieldRef Name="Manager_x0020__x0028_yes_x002f_n"/>' +
+'<FieldRef Name="Directorate"/>' +
+'<FieldRef Name="Division"/>' +
+'<FieldRef Name="Department"/>' +
+'</ViewFields></viewFields>' +
+'<rowLimit>500</rowLimit>' +
+'</GetListItems>' +
+'</soap:Body>' +
+'</soap:Envelope>';
+
+try {
+const response = await fetch("/_vti_bin/Lists.asmx", {
+method: "POST",
+headers: {
+"Content-Type": "text/xml; charset=utf-8",
+"SOAPAction": "http://schemas.microsoft.com/sharepoint/soap/GetListItems"
+},
+body: soapEnvelope
+});
+
+if (!response.ok) {
+throw new Error(`HTTP error! status: ${response.status}`);
+}
+
+const data = await response.text();
+displayData(data, employeeLinks);
+} catch (error) {
+console.error("Error retrieving data: ", error);
+}
+}
+
+function displayData(data, employeeLinks) {
+const parser = new DOMParser();
+const xmlDoc = parser.parseFromString(data, "text/xml");
+const items = xmlDoc.getElementsByTagName("z:row");
+const container = document.getElementById('treeContainer');
+const hierarchy = {};
+
+for (let i = 0; i < items.length; i++) {
+const linkTitle = items[i].getAttribute("ows_LinkTitle");
+const itemId = items[i].getAttribute("ows_ID");
+const isManager = items[i].getAttribute("ows_Manager_x0020__x0028_yes_x002f_n");
+const directorate = items[i].getAttribute("ows_Directorate");
+const division = items[i].getAttribute("ows_Division");
+const department = items[i].getAttribute("ows_Department");
+
+if (!directorate && !division && !department) {
+continue;
+}
+
+if (linkTitle) {
+if (!hierarchy[directorate]) {
+hierarchy[directorate] = { divisions: {}, employees: [] };
+}
+
+if (division && division !== "null") {
+if (!hierarchy[directorate].divisions[division]) {
+hierarchy[directorate].divisions[division] = { departments: {}, employees: [] };
+}
+
+if (department && department !== "null") {
+if (!hierarchy[directorate].divisions[division].departments[department]) {
+hierarchy[directorate].divisions[division].departments[department] = [];
+}
+
+if (employeeLinks[linkTitle]) {
+hierarchy[directorate].divisions[division].departments[department].push({
+name: linkTitle,
+id: itemId,
+link: employeeLinks[linkTitle].link,
+isManager,
+photo: employeeLinks[linkTitle].photo
+});
+} else {
+console.warn(`Employee link not found for: ${linkTitle}`);
+}
+} else {
+if (employeeLinks[linkTitle]) {
+hierarchy[directorate].divisions[division].employees.push({
+name: linkTitle,
+id: itemId,
+link: employeeLinks[linkTitle].link,
+isManager,
+photo: employeeLinks[linkTitle].photo
+});
+} else {
+console.warn(`Employee link not found for: ${linkTitle}`);
+}
+}
+} else {
+if (employeeLinks[linkTitle]) {
+hierarchy[directorate].employees.push({
+name: linkTitle,
+id: itemId,
+link: employeeLinks[linkTitle].link,
+isManager,
+photo: employeeLinks[linkTitle].photo
+});
+} else {
+console.warn(`Employee link not found for: ${linkTitle}`);
+}
+}
+}
+}
+
+const sortedHierarchy = {};
+const directoratesOrder = ["Техническая дирекция", "Управление", "Финансовая дирекция", "Дирекция трансформации и развитию бизнеса", "Коммерческая дирекция"];
+directoratesOrder.forEach(directorate => {
+if (hierarchy[directorate]) {
+sortedHierarchy[directorate] = hierarchy[directorate];
+}
+});
+
+// Сохраняем иерархию глобально для поиска
+globalHierarchy = sortedHierarchy;
+buildSearchableItems();
+initializeSearch();
+
+createTree(sortedHierarchy, container, employeeLinks);
+}
+
+// Функция для построения списка элементов для поиска
+function buildSearchableItems() {
+searchableItems = [];
+
+for (const directorate in globalHierarchy) {
+// Добавляем дирекцию
+searchableItems.push({
+name: directorate,
+type: 'directorate',
+path: [directorate]
+});
+
+// Добавляем департаменты
+for (const division in globalHierarchy[directorate].divisions) {
+searchableItems.push({
+name: division,
+type: 'division',
+path: [directorate, division]
+});
+
+// Добавляем отделы
+for (const department in globalHierarchy[directorate].divisions[division].departments) {
+searchableItems.push({
+name: department,
+type: 'department',
+path: [directorate, division, department]
+});
+}
+}
+}
+}
+
+// Инициализация поиска
+function initializeSearch() {
+const searchInput = document.getElementById('searchInput');
+const searchDropdown = document.getElementById('searchDropdown');
+
+searchInput.addEventListener('input', function() {
+const query = this.value.toLowerCase().trim();
+
+if (query.length === 0) {
+searchDropdown.style.display = 'none';
+return;
+}
+
+const filteredItems = searchableItems.filter(item => 
+item.name.toLowerCase().includes(query)
+);
+
+if (filteredItems.length > 0) {
+displaySearchResults(filteredItems);
+searchDropdown.style.display = 'block';
+} else {
+searchDropdown.style.display = 'none';
+}
+});
+
+// Скрываем выпадающий список при клике вне его
+document.addEventListener('click', function(event) {
+if (!event.target.closest('#searchWrapper')) {
+searchDropdown.style.display = 'none';
+}
+});
+}
+
+// Отображение результатов поиска
+function displaySearchResults(items) {
+const dropdown = document.getElementById('searchDropdown');
+dropdown.innerHTML = '';
+
+items.forEach(item => {
+const div = document.createElement('div');
+div.className = 'search-result-item';
+div.textContent = item.name;
+div.setAttribute('data-type', item.type);
+div.setAttribute('data-path', JSON.stringify(item.path));
+
+div.addEventListener('click', function() {
+navigateToItem(item);
+dropdown.style.display = 'none';
+document.getElementById('searchInput').value = '';
+});
+
+dropdown.appendChild(div);
+});
+}
+
+// Навигация к выбранному элементу
+function navigateToItem(item) {
+// Сначала закрываем все открытые блоки
+$('.block.division > .division-inner-container > ul').hide();
+$('.block.division').removeClass('open');
+$('.block.department > .department-inner-container > ul').hide();
+$('.block.department').removeClass('open');
+
+const [directorate, division, department] = item.path;
+
+if (item.type === 'division' && division) {
+// Находим и открываем департамент
+const divisionBlock = $(`.block.division:contains('${division}')`).filter(function() {
+return $(this).text().trim() === division;
+});
+
+if (divisionBlock.length > 0) {
+const divisionUl = divisionBlock.find('.division-inner-container > ul');
+divisionUl.show();
+divisionBlock.addClass('open');
+// Прокручиваем к элементу
+divisionBlock[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+} else if (item.type === 'department' && department) {
+// Находим и открываем департамент, затем отдел
+const divisionBlock = $(`.block.division:contains('${division}')`).filter(function() {
+return $(this).text().trim() === division;
+});
+
+if (divisionBlock.length > 0) {
+const divisionUl = divisionBlock.find('.division-inner-container > ul');
+divisionUl.show();
+divisionBlock.addClass('open');
+
+// Находим и открываем отдел
+setTimeout(() => {
+const departmentBlock = divisionBlock.find(`.block.department:contains('${department}')`).filter(function() {
+return $(this).text().trim() === department;
+});
+
+if (departmentBlock.length > 0) {
+const departmentUl = departmentBlock.find('.department-inner-container > ul');
+departmentUl.show();
+departmentBlock.addClass('open');
+// Прокручиваем к элементу
+departmentBlock[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+}, 100);
+}
+} else if (item.type === 'directorate') {
+// Прокручиваем к дирекции
+const directorateBlock = $(`.block.directorate:contains('${directorate}')`).filter(function() {
+return $(this).find('span').first().text().trim() === directorate;
+});
+
+if (directorateBlock.length > 0) {
+directorateBlock[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+}
+}
+
+function createTree(hierarchy, parentContainer, employeeLinks) {
+if (!parentContainer) {
+console.error("Parent container is null. Check if the element exists in the DOM.");
+return;
+}
+
+const directorateUl = document.createElement('ul');
+parentContainer.appendChild(directorateUl);
+
+for (const directorate in hierarchy) {
+const directorateLi = document.createElement('li');
+directorateLi.className = 'block directorate';
+
+const directorateTitle = document.createElement('span');
+directorateTitle.textContent = directorate;
+directorateTitle.style.textAlign = 'center';
+directorateTitle.style.color = '#FFFFFF';
+directorateTitle.style.fontWeight = 'bold';
+directorateLi.appendChild(directorateTitle);
+
+const innerContainer = document.createElement('div');
+innerContainer.className = 'inner-container';
+directorateLi.appendChild(innerContainer);
+
+const innerUl = document.createElement('ul');
+innerContainer.appendChild(innerUl);
+directorateUl.appendChild(directorateLi);
+
+const managers = hierarchy[directorate].employees.filter(emp => emp.isManager === "1");
+const otherEmployees = hierarchy[directorate].employees.filter(emp => emp.isManager !== "1");
+const sortedEmployees = [...managers, ...otherEmployees];
+
+sortedEmployees.forEach(employee => {
+const nameLi = document.createElement('li');
+const link = document.createElement('a');
+link.textContent = employee.name;
+link.href = employee.link;
+link.target = '_blank';
+
+if (employee.name === "Урьев Григорий Анатольевич") {
+link.innerHTML = `<strong>${employee.name} 🤴🏻</strong>`;
+} else if (employee.isManager === "1") {
+link.innerHTML = `<strong>${employee.name} 👑</strong>`;
+} else {
+link.textContent = employee.name;
+}
+
+link.addEventListener('mouseover', () => {
+const tooltip = document.getElementById('photoTooltip');
+const tooltipImage = document.getElementById('tooltipImage');
+tooltipImage.src = employee.photo.split(',')[0];
+tooltip.style.display = 'block';
+tooltip.style.left = `${link.getBoundingClientRect().left}px`;
+tooltip.style.top = `${link.getBoundingClientRect().bottom + 5}px`;
+});
+
+link.addEventListener('mouseout', () => {
+const tooltip = document.getElementById('photoTooltip');
+tooltip.style.display = 'none';
+});
+
+nameLi.appendChild(link);
+nameLi.style.margin = '0';
+nameLi.style.textAlign = 'left';
+nameLi.style.listStyleType = 'none';
+innerUl.appendChild(nameLi);
+});
+
+for (const division in hierarchy[directorate].divisions) {
+const divisionLi = document.createElement('li');
+divisionLi.className = 'block division';
+
+const divisionTitle = document.createElement('span');
+divisionTitle.textContent = division;
+divisionTitle.style.cursor = 'pointer';
+divisionTitle.style.color = '#FFFFFF';
+divisionTitle.style.fontWeight = 'bold';
+divisionLi.appendChild(divisionTitle);
+
+const divisionInnerContainer = document.createElement('div');
+divisionInnerContainer.className = 'division-inner-container';
+divisionLi.appendChild(divisionInnerContainer);
+
+const divisionUl = document.createElement('ul');
+divisionInnerContainer.appendChild(divisionUl);
+innerUl.appendChild(divisionLi);
+
+divisionUl.style.display = 'none';
+
+const divisionEmployees = hierarchy[directorate].divisions[division].employees;
+const divisionManagers = divisionEmployees.filter(emp => emp.isManager === "1");
+const divisionOtherEmployees = divisionEmployees.filter(emp => emp.isManager !== "1");
+const sortedDivisionEmployees = [...divisionManagers, ...divisionOtherEmployees];
+
+sortedDivisionEmployees.forEach(employee => {
+const nameLi = document.createElement('li');
+const link = document.createElement('a');
+link.textContent = employee.name;
+link.href = employee.link;
+link.target = '_blank';
+
+if (employee.isManager === "1") {
+link.innerHTML = `<strong>${employee.name} 👑</strong>`;
+}
+
+link.addEventListener('mouseover', () => {
+const tooltip = document.getElementById('photoTooltip');
+const tooltipImage = document.getElementById('tooltipImage');
+tooltipImage.src = employee.photo.split(',')[0];
+tooltip.style.display = 'block';
+tooltip.style.left = `${link.getBoundingClientRect().left}px`;
+tooltip.style.top = `${link.getBoundingClientRect().bottom + 5}px`;
+});
+
+link.addEventListener('mouseout', () => {
+const tooltip = document.getElementById('photoTooltip');
+tooltip.style.display = 'none';
+});
+
+nameLi.appendChild(link);
+nameLi.style.margin = '0';
+nameLi.style.textAlign = 'left';
+nameLi.style.listStyleType = 'none';
+divisionUl.appendChild(nameLi);
+});
+
+for (const department in hierarchy[directorate].divisions[division].departments) {
+const departmentLi = document.createElement('li');
+departmentLi.className = 'block department';
+departmentLi.textContent = department;
+departmentLi.style.fontWeight = 'bold';
+departmentLi.style.color = '#FFFFFF';
+
+const departmentInnerContainer = document.createElement('div');
+departmentInnerContainer.className = 'department-inner-container';
+departmentLi.appendChild(departmentInnerContainer);
+
+const departmentUl = document.createElement('ul');
+departmentInnerContainer.appendChild(departmentUl);
+divisionUl.appendChild(departmentLi);
+
+departmentUl.style.display = 'none';
+
+const departmentEmployees = hierarchy[directorate].divisions[division].departments[department];
+const departmentManagers = departmentEmployees.filter(emp => emp.isManager === "1");
+const departmentOtherEmployees = departmentEmployees.filter(emp => emp.isManager !== "1");
+const sortedDepartmentEmployees = [...departmentManagers, ...departmentOtherEmployees];
+
+sortedDepartmentEmployees.forEach(employee => {
+const nameLi = document.createElement('li');
+const link = document.createElement('a');
+link.textContent = employee.name;
+link.href = employee.link;
+link.target = '_blank';
+
+if (employee.isManager === "1") {
+link.innerHTML = `<strong>${employee.name} 👑</strong>`;
+}
+
+link.addEventListener('mouseover', () => {
+const tooltip = document.getElementById('photoTooltip');
+const tooltipImage = document.getElementById('tooltipImage');
+tooltipImage.src = employee.photo.split(',')[0];
+tooltip.style.display = 'block';
+tooltip.style.left = `${link.getBoundingClientRect().left}px`;
+tooltip.style.top = `${link.getBoundingClientRect().bottom + 5}px`;
+});
+
+link.addEventListener('mouseout', () => {
+const tooltip = document.getElementById('photoTooltip');
+tooltip.style.display = 'none';
+});
+
+nameLi.appendChild(link);
+nameLi.style.margin = '0';
+nameLi.style.textAlign = 'left';
+nameLi.style.listStyleType = 'none';
+nameLi.style.fontWeight = 'normal';
+departmentUl.appendChild(nameLi);
+});
+}
+}
+}
+}
+
+$(document).ready(function() {
+getData();
+});
+
+$(document).on('click', '.block.division', function(e) {
+if ($(e.target).closest('.division-inner-container').length === 0) {
+const divisionUl = $(this).find('.division-inner-container > ul');
+$('.block.division > .division-inner-container > ul').not(divisionUl).hide();
+$('.block.division').not(this).removeClass('open');
+
+divisionUl.toggle();
+$(this).toggleClass('open');
+e.stopPropagation();
+}
+});
+
+$(document).on('click', '.block.department', function(e) {
+if ($(e.target).closest('.department-inner-container').length === 0) {
+const departmentUl = $(this).find('.department-inner-container > ul');
+$('.block.department > .department-inner-container > ul').not(departmentUl).hide();
+$('.block.department').not(this).removeClass('open');
+
+departmentUl.toggle();
+$(this).toggleClass('open');
+e.stopPropagation();
+}
+});
+</script>
+
+<style>
+ul {
+padding: 0;
+margin: 0;
+}
+.tree {
+list-style-type: none;
+}
+#treeContainer {
+max-width: 1800px;
+margin: 0 auto;
+}
+.block {
+display: block;
+padding: 10px;
+margin: 5px 0;
+border: 2px solid #FFDF94;
+border-radius: 5px;
+cursor: pointer;
+transition: background-color 0.3s;
+}
+.block.directorate {
+display: inline-block;
+width: 500px;
+vertical-align: top;
+margin-right: 10px;
+background-color: #002C84;
+text-align: center;
+cursor: default;
+}
+
+.block.directorate:hover {
+background-color: #011a59;
+}   
+
+.block.division {
+background-color: #573f8f;
+}
+
+.block.division:hover {
+background-color: #3d235c;
+}
+
+.block.department {
+background-color: #4862c2;
+}
+
+.block.department:hover {
+background-color: #2f4699;
+}
+.inner-container {
+background-color: #ffffff;
+padding: 10px;
+border: 1px solid #FFDF94;
+border-radius: 5px;
+margin-top: 5px;
+cursor: default;
+}
+.division-inner-container {
+background-color: #ffffff;
+padding: 10px;
+border: 1px solid #FFDF94;
+border-radius: 5px;
+margin-top: 5px;
+cursor: default;
+}
+.department-inner-container {
+background-color: #ffffff;
+padding: 10px;
+border: 1px solid #FFDF94;
+border-radius: 5px;
+margin-top: 5px;
+cursor: default;
+}
+.block.division:not(.open) > .division-inner-container {
+display: none;
+}
+.block.department:not(.open) > .department-inner-container {
+display: none;
+}
+
+#photoTooltip {
+position: absolute;
+z-index: 1000;
+background-color: #ffffff;
+border: 1px solid #011a59;
+border-radius: 10px;
+padding: 5px;
+pointer-events: none;
+}
+
+/* Стили для поиска */
+#searchWrapper {
+position: relative;
+}
+
+#searchInput {
+width: 100%;
+padding: 10px;
+border: 2px solid #FFDF94;
+border-radius: 5px;
+font-size: 14px;
+box-sizing: border-box;
+outline: none;
+}
+
+#searchInput:focus {
+border-color: #002C84;
+box-shadow: 0 0 5px rgba(0, 44, 132, 0.3);
+}
+
+#searchDropdown {
+position: absolute;
+top: 100%;
+left: 0;
+right: 0;
+background: white;
+border: 2px solid #FFDF94;
+border-top: none;
+border-radius: 0 0 5px 5px;
+max-height: 300px;
+overflow-y: auto;
+z-index: 1001;
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.search-result-item {
+padding: 10px 15px;
+cursor: pointer;
+border-bottom: 1px solid #f0f0f0;
+transition: background-color 0.2s;
+}
+
+.search-result-item:hover {
+background-color: #f8f9fa;
+}
+
+.search-result-item:last-child {
+border-bottom: none;
+}
+
+.search-result-item[data-type="directorate"] {
+font-weight: bold;
+color: #002C84;
+}
+
+.search-result-item[data-type="division"] {
+color: #573f8f;
+padding-left: 25px;
+}
+
+.search-result-item[data-type="department"] {
+color: #4862c2;
+padding-left: 35px;
+}
+</style>
+]]></Content>
+<PartStorage xmlns="http://schemas.microsoft.com/WebPart/v2/ContentEditor" />
+</WebPart>
+</WebPartPages:ContentEditorWebPart>
