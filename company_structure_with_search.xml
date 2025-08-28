@@ -28,9 +28,9 @@
 <ContentLink xmlns="http://schemas.microsoft.com/WebPart/v2/ContentEditor" />
 <Content xmlns="http://schemas.microsoft.com/WebPart/v2/ContentEditor"><![CDATA[
 <!-- Поле поиска -->
-<div id="searchContainer" style="text-align: center; margin-bottom: 20px;">
+<div id="searchContainer" style="text-align: center; margin: 20px 0 20px 0;">
     <div id="searchWrapper" style="position: relative; display: inline-block; width: 400px;">
-        <input type="text" id="searchInput" placeholder="Поиск по дирекциям, департаментам и отделам..." style="width: 100%; padding: 10px; border: 2px solid #FFDF94; border-radius: 5px; font-size: 14px; box-sizing: border-box;" />
+        <input type="text" id="searchInput" placeholder="Поиск по дирекциям, департаментам и отделам..." style="width: 100%; padding: 10px; border: 2px solid #FFDF94; border-radius: 5px; font-size: 12px; box-sizing: border-box;" />
         <div id="searchDropdown" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 2px solid #FFDF94; border-top: none; border-radius: 0 0 5px 5px; max-height: 300px; overflow-y: auto; z-index: 1001; display: none;">
         </div>
     </div>
@@ -287,7 +287,9 @@ searchInput.addEventListener('input', function() {
 const query = this.value.toLowerCase().trim();
 
 if (query.length === 0) {
-searchDropdown.style.display = 'none';
+// Показываем все элементы при пустом запросе
+displaySearchResults(searchableItems);
+searchDropdown.style.display = 'block';
 return;
 }
 
@@ -301,6 +303,24 @@ searchDropdown.style.display = 'block';
 } else {
 searchDropdown.style.display = 'none';
 }
+});
+
+// Показываем выпадающий список при фокусе
+searchInput.addEventListener('focus', function() {
+const query = this.value.toLowerCase().trim();
+if (query.length === 0) {
+// Показываем все элементы при пустом поле
+displaySearchResults(searchableItems);
+} else {
+// Показываем отфильтрованные элементы
+const filteredItems = searchableItems.filter(item => 
+item.name.toLowerCase().includes(query)
+);
+if (filteredItems.length > 0) {
+displaySearchResults(filteredItems);
+}
+}
+searchDropdown.style.display = 'block';
 });
 
 // Скрываем выпадающий список при клике вне его
@@ -737,7 +757,7 @@ width: 100%;
 padding: 10px;
 border: 2px solid #FFDF94;
 border-radius: 5px;
-font-size: 14px;
+font-size: 12px;
 box-sizing: border-box;
 outline: none;
 }
