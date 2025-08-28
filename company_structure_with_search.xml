@@ -494,8 +494,30 @@ const tooltip = document.getElementById('photoTooltip');
 const tooltipImage = document.getElementById('tooltipImage');
 tooltipImage.src = employee.photo.split(',')[0];
 tooltip.style.display = 'block';
-tooltip.style.left = `${link.getBoundingClientRect().left}px`;
-tooltip.style.top = `${link.getBoundingClientRect().bottom + 5}px`;
+
+// Получаем координаты с учетом прокрутки
+const rect = link.getBoundingClientRect();
+const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+// Базовые координаты
+let left = rect.left + scrollLeft;
+let top = rect.bottom + scrollTop + 5;
+
+// Проверяем, не выходит ли tooltip за правую границу экрана
+const tooltipWidth = 200; // примерная ширина tooltip
+if (left + tooltipWidth > window.innerWidth + scrollLeft) {
+left = rect.right + scrollLeft - tooltipWidth;
+}
+
+// Проверяем, не выходит ли tooltip за нижнюю границу экрана
+const tooltipHeight = 170; // примерная высота tooltip (160px изображение + отступы)
+if (top + tooltipHeight > window.innerHeight + scrollTop) {
+top = rect.top + scrollTop - tooltipHeight - 5; // показываем сверху
+}
+
+tooltip.style.left = `${Math.max(0, left)}px`;
+tooltip.style.top = `${Math.max(0, top)}px`;
 });
 
 link.addEventListener('mouseout', () => {
@@ -552,8 +574,30 @@ const tooltip = document.getElementById('photoTooltip');
 const tooltipImage = document.getElementById('tooltipImage');
 tooltipImage.src = employee.photo.split(',')[0];
 tooltip.style.display = 'block';
-tooltip.style.left = `${link.getBoundingClientRect().left}px`;
-tooltip.style.top = `${link.getBoundingClientRect().bottom + 5}px`;
+
+// Получаем координаты с учетом прокрутки
+const rect = link.getBoundingClientRect();
+const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+// Базовые координаты
+let left = rect.left + scrollLeft;
+let top = rect.bottom + scrollTop + 5;
+
+// Проверяем, не выходит ли tooltip за правую границу экрана
+const tooltipWidth = 200; // примерная ширина tooltip
+if (left + tooltipWidth > window.innerWidth + scrollLeft) {
+left = rect.right + scrollLeft - tooltipWidth;
+}
+
+// Проверяем, не выходит ли tooltip за нижнюю границу экрана
+const tooltipHeight = 170; // примерная высота tooltip (160px изображение + отступы)
+if (top + tooltipHeight > window.innerHeight + scrollTop) {
+top = rect.top + scrollTop - tooltipHeight - 5; // показываем сверху
+}
+
+tooltip.style.left = `${Math.max(0, left)}px`;
+tooltip.style.top = `${Math.max(0, top)}px`;
 });
 
 link.addEventListener('mouseout', () => {
@@ -606,8 +650,30 @@ const tooltip = document.getElementById('photoTooltip');
 const tooltipImage = document.getElementById('tooltipImage');
 tooltipImage.src = employee.photo.split(',')[0];
 tooltip.style.display = 'block';
-tooltip.style.left = `${link.getBoundingClientRect().left}px`;
-tooltip.style.top = `${link.getBoundingClientRect().bottom + 5}px`;
+
+// Получаем координаты с учетом прокрутки
+const rect = link.getBoundingClientRect();
+const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+// Базовые координаты
+let left = rect.left + scrollLeft;
+let top = rect.bottom + scrollTop + 5;
+
+// Проверяем, не выходит ли tooltip за правую границу экрана
+const tooltipWidth = 200; // примерная ширина tooltip
+if (left + tooltipWidth > window.innerWidth + scrollLeft) {
+left = rect.right + scrollLeft - tooltipWidth;
+}
+
+// Проверяем, не выходит ли tooltip за нижнюю границу экрана
+const tooltipHeight = 170; // примерная высота tooltip (160px изображение + отступы)
+if (top + tooltipHeight > window.innerHeight + scrollTop) {
+top = rect.top + scrollTop - tooltipHeight - 5; // показываем сверху
+}
+
+tooltip.style.left = `${Math.max(0, left)}px`;
+tooltip.style.top = `${Math.max(0, top)}px`;
 });
 
 link.addEventListener('mouseout', () => {
@@ -745,6 +811,8 @@ border: 1px solid #011a59;
 border-radius: 10px;
 padding: 5px;
 pointer-events: none;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+max-width: 200px;
 }
 
 /* Стили для поиска */
