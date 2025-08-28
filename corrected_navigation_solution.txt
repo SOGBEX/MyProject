@@ -1,0 +1,175 @@
+ИСПРАВЛЕННОЕ РЕШЕНИЕ для default.master:
+
+ВАРИАНТ 1: Использование JavaScript для динамического позиционирования
+
+Найдите закрывающие теги:
+</asp:ContentPlaceHolder>
+</div>
+</div>
+
+И замените на:
+
+</asp:ContentPlaceHolder>
+</div>
+
+<!-- Кастомный раздел "Вопросы и предложения" с принудительным позиционированием внизу -->
+<div id="customQuestionSection" style="position: absolute; bottom: 10px; left: 4px; right: 4px; max-width: 150px;">
+    <div style="border-top: 1px solid #c6c6c6; padding-top: 8px; background: white;">
+        <SharePoint:UIVersionedContent UIVersion="3" runat="server">
+        <ContentTemplate>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tbody>
+            <tr><td nowrap="nowrap" style="padding: 2px 0;">
+                <a href="mailto:dl-a@s.ru?subject=Вопросы%20и%20предложения&body=Здравствуйте!%0A%0AУ%20меня%20есть%20вопрос/предложение:%0A%0A" 
+                   class="custom-question-link"
+                   style="color: #003399; text-decoration: none; font-size: 13px; font-weight: bold; font-family: verdana,arial,helvetica,sans-serif; display: block; padding: 3px 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                   &#x2709; Вопросы и предложения
+                </a>
+            </td></tr>
+            </tbody>
+            </table>
+        </ContentTemplate>
+        </SharePoint:UIVersionedContent>
+        <SharePoint:UIVersionedContent UIVersion="4" runat="server">
+        <ContentTemplate>
+            <div style="padding: 5px 0;">
+                <a href="mailto:dl-a@s.ru?subject=Вопросы%20и%20предложения&body=Здравствуйте!%0A%0AУ%20меня%20есть%20вопрос/предложение:%0A%0A" 
+                   class="custom-question-link-v4"
+                   style="color: #0072bc; text-decoration: none; font-size: 13px; font-weight: bold; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; display: block; padding: 3px 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                   &#x2709; Вопросы и предложения
+                </a>
+            </div>
+        </ContentTemplate>
+        </SharePoint:UIVersionedContent>
+    </div>
+</div>
+</div>
+
+<script type="text/javascript">
+// Функция для корректного позиционирования внизу
+function positionCustomSection() {
+    var container = document.querySelector('.ms-quicklaunchouter');
+    var customSection = document.getElementById('customQuestionSection');
+    
+    if (container && customSection) {
+        var containerHeight = container.offsetHeight;
+        var sectionHeight = customSection.offsetHeight;
+        
+        // Устанавливаем позицию внизу контейнера
+        customSection.style.top = (containerHeight - sectionHeight - 10) + 'px';
+    }
+}
+
+// Выполняем позиционирование после загрузки страницы
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', positionCustomSection);
+} else {
+    positionCustomSection();
+}
+
+// Также выполняем при изменении размера окна
+window.addEventListener('resize', positionCustomSection);
+</script>
+
+ВАРИАНТ 2: Простое решение без JavaScript (рекомендуемый)
+
+Найдите закрывающие теги:
+</asp:ContentPlaceHolder>
+</div>
+</div>
+
+И замените на:
+
+</asp:ContentPlaceHolder>
+
+<!-- Добавляем spacer для выталкивания вниз -->
+<div style="height: 100px;"></div>
+
+<!-- Кастомный раздел "Вопросы и предложения" -->
+<div style="margin-top: 20px; padding: 8px 4px; border-top: 1px solid #c6c6c6; background: white; max-width: 150px; box-sizing: border-box;">
+    <SharePoint:UIVersionedContent UIVersion="3" runat="server">
+    <ContentTemplate>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tbody>
+        <tr><td nowrap="nowrap" style="padding: 2px 0;">
+            <a href="mailto:dl-a@s.ru?subject=Вопросы%20и%20предложения&body=Здравствуйте!%0A%0AУ%20меня%20есть%20вопрос/предложение:%0A%0A" 
+               class="custom-question-link"
+               style="color: #003399; text-decoration: none; font-size: 13px; font-weight: bold; font-family: verdana,arial,helvetica,sans-serif; display: block; padding: 3px 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+               &#x2709; Вопросы и предложения
+            </a>
+        </td></tr>
+        </tbody>
+        </table>
+    </ContentTemplate>
+    </SharePoint:UIVersionedContent>
+    <SharePoint:UIVersionedContent UIVersion="4" runat="server">
+    <ContentTemplate>
+        <div style="padding: 2px 0;">
+            <a href="mailto:dl-a@s.ru?subject=Вопросы%20и%20предложения&body=Здравствуйте!%0A%0AУ%20меня%20есть%20вопрос/предложение:%0A%0A" 
+               class="custom-question-link-v4"
+               style="color: #0072bc; text-decoration: none; font-size: 13px; font-weight: bold; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; display: block; padding: 3px 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+               &#x2709; Вопросы и предложения
+            </a>
+        </div>
+    </ContentTemplate>
+    </SharePoint:UIVersionedContent>
+</div>
+</div>
+
+CSS СТИЛИ (добавить в head или отдельный файл):
+
+<style type="text/css">
+/* Убираем анимации, оставляем только смену цвета и подчеркивание */
+.custom-question-link:hover, .custom-question-link-v4:hover {
+    color: #cc0000 !important;
+    text-decoration: underline !important;
+}
+
+/* Убираем все transition и дополнительные эффекты */
+.custom-question-link, .custom-question-link-v4 {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Ограничиваем ширину основного контейнера */
+.ms-quicklaunchouter {
+    max-width: 165px !important;
+    overflow: hidden !important;
+}
+
+.ms-quickLaunch {
+    max-width: 160px !important;
+    overflow: hidden !important;
+}
+
+/* Дополнительные ограничения для предотвращения расширения */
+.ms-nav {
+    max-width: 160px !important;
+}
+
+.ms-navframe {
+    max-width: 158px !important;
+}
+</style>
+
+ВАРИАНТ 3: Если нужно еще больше пространства снизу
+
+Измените высоту spacer:
+<div style="height: 150px;"></div> <!-- Увеличьте до 150px или больше -->
+
+ОБЪЯСНЕНИЕ ИЗМЕНЕНИЙ:
+
+1. ✅ Убрано выравнивание по низу через flexbox (не работало)
+2. ✅ Добавлен spacer div для выталкивания элемента вниз
+3. ✅ Убраны все анимации (transition)
+4. ✅ Оставлен только значок письма &#x2709;
+5. ✅ Добавлены ограничения ширины:
+   - max-width: 150px для самого блока
+   - max-width: 165px для ms-quicklaunchouter
+   - overflow: hidden для предотвращения расширения
+   - text-overflow: ellipsis для длинного текста
+6. ✅ Белый фон для лучшей видимости
+7. ✅ box-sizing: border-box для корректного расчета размеров
+
+РЕКОМЕНДАЦИЯ:
+Используйте Вариант 2 (без JavaScript) - он самый надежный и простой.
