@@ -1,0 +1,98 @@
+Вот код, который нужно добавить в ваш default.master файл:
+
+Найдите блок PlaceHolderQuickLaunchBottom и замените его содержимое на следующий код:
+
+<asp:ContentPlaceHolder id="PlaceHolderQuickLaunchBottom" runat="server">
+<SharePoint:UIVersionedContent UIVersion="3" runat="server" id="PlaceHolderQuickLaunchBottomV3">
+<ContentTemplate>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" class="s4-die">
+<tbody>
+<tr><td>
+<table class="ms-recyclebin" width="100%" cellpadding="0" cellspacing="0" border="0">
+<tbody>
+<tr><td nowrap="nowrap">
+<SharePoint:SPLinkButton runat="server" NavigateUrl="~site/_layouts/recyclebin.aspx" id="v3idNavLinkRecycleBin" ImageUrl="/_layouts/images/recycbin.gif" Text="<%$Resources:wss,StsDefault_RecycleBin%>" PermissionsString="DeleteListItems" />
+</td></tr>
+<!-- Добавляем новый раздел "Вопросы и предложения" -->
+<tr><td nowrap="nowrap">
+<a href="mailto:dl-a@s.ru?subject=Вопросы%20и%20предложения&body=Здравствуйте!%0A%0AУ%20меня%20есть%20вопрос/предложение:%0A%0A" 
+   style="color: #003399; text-decoration: none; font-size: 11px; font-family: verdana,arial,helvetica,sans-serif;">
+   <img src="/_layouts/images/mail.gif" alt="" style="border: none; vertical-align: middle; margin-right: 3px;" />
+   Вопросы и предложения
+</a>
+</td></tr>
+</table>
+</td></tr>
+</table>
+</ContentTemplate>
+</SharePoint:UIVersionedContent>
+<SharePoint:UIVersionedContent UIVersion="4" runat="server" id="PlaceHolderQuickLaunchBottomV4">
+<ContentTemplate>
+<ul class="s4-specialNavLinkList">
+<li>
+<SharePoint:ClusteredSPLinkButton
+runat="server"
+NavigateUrl="~site/_layouts/recyclebin.aspx"
+ImageClass="s4-specialNavIcon"
+ImageUrl="/_layouts/images/fgimg.png"
+ImageWidth=16
+ImageHeight=16
+OffsetX=0
+OffsetY=428
+id="idNavLinkRecycleBin"
+Text="<%$Resources:wss,StsDefault_RecycleBin%>"
+CssClass="s4-rcycl"
+PermissionsString="DeleteListItems" />
+</li>
+<li>
+<SharePoint:ClusteredSPLinkButton
+id="idNavLinkViewAllV4"
+runat="server"
+PermissionsString="ViewFormPages"
+NavigateUrl="~site/_layouts/viewlsts.aspx"
+ImageClass="s4-specialNavIcon"
+ImageUrl="/_layouts/images/fgimg.png"
+ImageWidth=16
+ImageHeight=16
+OffsetX=0
+OffsetY=0
+Text="<%$Resources:wss,quiklnch_allcontent_short%>"
+accesskey="<%$Resources:wss,quiklnch_allcontent_AK%>"/>
+</li>
+<!-- Добавляем новый раздел "Вопросы и предложения" для UI v4 -->
+<li>
+<a href="mailto:dl-a@s.ru?subject=Вопросы%20и%20предложения&body=Здравствуйте!%0A%0AУ%20меня%20есть%20вопрос/предложение:%0A%0A" 
+   class="s4-specialNavIcon" 
+   style="color: #0072bc; text-decoration: none; font-size: 11px; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; display: block; padding: 3px 0 3px 20px; background: url('/_layouts/images/fgimg.png') no-repeat 0 -444px;">
+   Вопросы и предложения
+</a>
+</li>
+</ul>
+</ContentTemplate>
+</SharePoint:UIVersionedContent>
+</asp:ContentPlaceHolder>
+
+ОБЪЯСНЕНИЕ ИЗМЕНЕНИЙ:
+
+1. Для UIVersion 3 (старая версия SharePoint):
+   - Добавлена новая строка таблицы с ссылкой mailto
+   - Использована стандартная иконка mail.gif
+   - Применены стили, соответствующие другим элементам навигации
+
+2. Для UIVersion 4 (SharePoint 2010):
+   - Добавлен новый элемент списка <li>
+   - Использована стандартная иконка из fgimg.png (спрайт)
+   - Применены стили s4-specialNavIcon для консистентности
+
+3. Ссылка mailto содержит:
+   - Получатель: dl-a@s.ru
+   - Тема: "Вопросы и предложения" (URL-кодированная)
+   - Предзаполненное тело письма с приветствием
+
+АЛЬТЕРНАТИВНЫЙ ВАРИАНТ (если нужна более гибкая настройка):
+
+Если вы хотите добавить JavaScript для более сложной логики формирования письма, можете заменить href на onclick:
+
+onclick="window.location.href='mailto:dl-a@s.ru?subject=' + encodeURIComponent('Вопросы и предложения') + '&body=' + encodeURIComponent('Здравствуйте!\n\nУ меня есть вопрос/предложение:\n\n'); return false;"
+
+Это позволит добавить дополнительную информацию в письмо, например, текущую страницу или пользователя.

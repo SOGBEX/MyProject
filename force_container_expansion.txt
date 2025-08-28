@@ -1,0 +1,174 @@
+РЕШЕНИЕ ПРОБЛЕМЫ С РАСШИРЕНИЕМ КОНТЕЙНЕРА:
+
+Проблема: SharePoint имеет множество вложенных контейнеров с фиксированными ширинами, которые нужно переопределить.
+
+ОБНОВЛЕННЫЕ CSS СТИЛИ (замените все предыдущие CSS на эти):
+
+<style type="text/css">
+/* Простые hover-эффекты без анимаций */
+.custom-question-link:hover, .custom-question-link-v4:hover {
+    color: #cc0000 !important;
+    text-decoration: underline !important;
+}
+
+/* Базовые стили */
+.custom-question-link, .custom-question-link-v4 {
+    cursor: pointer;
+}
+
+/* ПРИНУДИТЕЛЬНОЕ РАСШИРЕНИЕ ВСЕХ УРОВНЕЙ КОНТЕЙНЕРОВ */
+
+/* Главная ячейка левой панели */
+.ms-leftareacell {
+    height: 100% !important;
+    position: relative !important;
+    width: auto !important;
+    min-width: 200px !important; /* Увеличиваем минимальную ширину */
+}
+
+/* Таблица навигации */
+.ms-nav {
+    width: auto !important;
+    min-width: 200px !important;
+}
+
+/* Фрейм навигации */
+.ms-navframe {
+    width: auto !important;
+    min-width: 198px !important;
+}
+
+/* Внешний контейнер быстрого запуска */
+.ms-quicklaunchouter {
+    width: auto !important;
+    min-width: 190px !important;
+    overflow: visible !important;
+}
+
+/* Внутренний контейнер быстрого запуска */
+.ms-quickLaunch {
+    width: auto !important;
+    min-width: 188px !important;
+    overflow: visible !important;
+}
+
+/* Контейнер TreeView */
+.ms-treeviewouter {
+    width: auto !important;
+    min-width: 180px !important;
+}
+
+/* Scroll контейнеры TreeView */
+#TreeViewRememberScroll, #TreeViewRememberScrollV4 {
+    width: auto !important;
+    min-width: 180px !important;
+}
+
+/* Специальные списки навигации для UI v4 */
+.s4-specialNavLinkList {
+    width: auto !important;
+    min-width: 180px !important;
+}
+
+/* Таблицы корзины */
+.ms-recyclebin {
+    width: auto !important;
+    min-width: 180px !important;
+}
+
+/* Кастомный контейнер */
+#customQuestionContainer {
+    width: auto !important;
+    min-width: 180px !important;
+    box-sizing: border-box;
+    left: 4px !important;
+    right: 4px !important; /* Возвращаем right, но с большей шириной контейнера */
+}
+
+/* Переопределяем inline стили если они мешают */
+td[width="100%"] {
+    width: auto !important;
+    min-width: 200px !important;
+}
+
+/* Убираем фиксированные ширины из атрибутов style */
+[style*="width: 150px"], [style*="width: 155px"] {
+    width: auto !important;
+    min-width: 180px !important;
+}
+</style>
+
+АЛЬТЕРНАТИВНОЕ РЕШЕНИЕ (если CSS не помогает):
+
+Если CSS переопределения не работают из-за inline стилей, нужно изменить HTML напрямую:
+
+1. Найдите эти строки в коде:
+   style="overflow: auto;height: 400px;width: 150px;"
+   
+   Замените на:
+   style="overflow: auto;height: 400px;width: 200px;"
+
+2. Найдите эту строку:
+   style="overflow: auto;height: 400px;width: 155px;"
+   
+   Замените на:
+   style="overflow: auto;height: 400px;width: 200px;"
+
+3. Найдите все атрибуты width="100%" в таблицах и замените на width="200px" или width="auto"
+
+JAVASCRIPT РЕШЕНИЕ (если ничего не помогает):
+
+Добавьте этот JavaScript код для принудительного изменения ширины после загрузки страницы:
+
+<script type="text/javascript">
+function expandNavigationContainers() {
+    // Расширяем все основные контейнеры
+    var containers = [
+        '.ms-leftareacell',
+        '.ms-nav',
+        '.ms-navframe', 
+        '.ms-quicklaunchouter',
+        '.ms-quickLaunch',
+        '.ms-treeviewouter',
+        '#TreeViewRememberScroll',
+        '#TreeViewRememberScrollV4'
+    ];
+    
+    containers.forEach(function(selector) {
+        var elements = document.querySelectorAll(selector);
+        elements.forEach(function(element) {
+            element.style.width = 'auto';
+            element.style.minWidth = '200px';
+            element.style.overflow = 'visible';
+        });
+    });
+    
+    // Специально для элементов с inline стилями
+    var inlineElements = document.querySelectorAll('[style*="width: 150px"], [style*="width: 155px"]');
+    inlineElements.forEach(function(element) {
+        element.style.width = '200px';
+    });
+}
+
+// Выполняем после загрузки DOM
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', expandNavigationContainers);
+} else {
+    expandNavigationContainers();
+}
+
+// Также выполняем через небольшую задержку для надежности
+setTimeout(expandNavigationContainers, 100);
+</script>
+
+ПРОСТЕЙШЕЕ РЕШЕНИЕ:
+
+Если все вышеперечисленное не работает, просто измените позиционирование кастомного блока:
+
+Замените:
+<div id="customQuestionContainer" style="position: absolute; bottom: 10px; left: 4px; right: 4px; z-index: 100;">
+
+На:
+<div id="customQuestionContainer" style="position: absolute; bottom: 10px; left: 4px; width: 220px; z-index: 100;">
+
+Это зафиксирует ширину блока в 220px, что должно быть достаточно для текста "Вопросы и предложения".

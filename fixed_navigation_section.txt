@@ -1,0 +1,124 @@
+ИСПРАВЛЕННЫЙ КОД для default.master:
+
+Замените весь блок PlaceHolderQuickLaunchBottom на следующий код (БЕЗ дополнительных блоков после него):
+
+<asp:ContentPlaceHolder id="PlaceHolderQuickLaunchBottom" runat="server">
+<SharePoint:UIVersionedContent UIVersion="3" runat="server" id="PlaceHolderQuickLaunchBottomV3">
+<ContentTemplate>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" class="s4-die">
+<tbody>
+<tr><td>
+<table class="ms-recyclebin" width="100%" cellpadding="0" cellspacing="0" border="0">
+<tbody>
+<tr><td nowrap="nowrap">
+<SharePoint:SPLinkButton runat="server" NavigateUrl="~site/_layouts/recyclebin.aspx" id="v3idNavLinkRecycleBin" ImageUrl="/_layouts/images/recycbin.gif" Text="<%$Resources:wss,StsDefault_RecycleBin%>" PermissionsString="DeleteListItems" />
+</td></tr>
+</table>
+</td></tr>
+<!-- Добавляем разделитель и кастомную ссылку -->
+<tr><td style="padding-top: 15px;">
+<div style="border-top: 1px solid #c6c6c6; padding-top: 8px; margin: 0 4px;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+<tbody>
+<tr><td nowrap="nowrap" style="padding: 2px 0;">
+<a href="mailto:dl-a@s.ru?subject=Вопросы%20и%20предложения&body=Здравствуйте!%0A%0AУ%20меня%20есть%20вопрос/предложение:%0A%0A" 
+   class="custom-question-link"
+   style="color: #003399; text-decoration: none; font-size: 13px; font-weight: bold; font-family: verdana,arial,helvetica,sans-serif; display: block; padding: 3px 0;">
+   &#x2709; &#x2753; Вопросы и предложения
+</a>
+</td></tr>
+</tbody>
+</table>
+</div>
+</td></tr>
+</table>
+</ContentTemplate>
+</SharePoint:UIVersionedContent>
+<SharePoint:UIVersionedContent UIVersion="4" runat="server" id="PlaceHolderQuickLaunchBottomV4">
+<ContentTemplate>
+<ul class="s4-specialNavLinkList">
+<li>
+<SharePoint:ClusteredSPLinkButton
+runat="server"
+NavigateUrl="~site/_layouts/recyclebin.aspx"
+ImageClass="s4-specialNavIcon"
+ImageUrl="/_layouts/images/fgimg.png"
+ImageWidth=16
+ImageHeight=16
+OffsetX=0
+OffsetY=428
+id="idNavLinkRecycleBin"
+Text="<%$Resources:wss,StsDefault_RecycleBin%>"
+CssClass="s4-rcycl"
+PermissionsString="DeleteListItems" />
+</li>
+<li>
+<SharePoint:ClusteredSPLinkButton
+id="idNavLinkViewAllV4"
+runat="server"
+PermissionsString="ViewFormPages"
+NavigateUrl="~site/_layouts/viewlsts.aspx"
+ImageClass="s4-specialNavIcon"
+ImageUrl="/_layouts/images/fgimg.png"
+ImageWidth=16
+ImageHeight=16
+OffsetX=0
+OffsetY=0
+Text="<%$Resources:wss,quiklnch_allcontent_short%>"
+accesskey="<%$Resources:wss,quiklnch_allcontent_AK%>"/>
+</li>
+<!-- Добавляем разделитель и кастомную ссылку для UI v4 -->
+<li style="border-top: 1px solid #c6c6c6; margin-top: 10px; padding-top: 8px;">
+<a href="mailto:dl-a@s.ru?subject=Вопросы%20и%20предложения&body=Здравствуйте!%0A%0AУ%20меня%20есть%20вопрос/предложение:%0A%0A" 
+   class="custom-question-link-v4"
+   style="color: #0072bc; text-decoration: none; font-size: 13px; font-weight: bold; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; display: block; padding: 3px 0 3px 0; line-height: 16px;">
+   &#x2709; &#x2753; Вопросы и предложения
+</a>
+</li>
+</ul>
+</ContentTemplate>
+</SharePoint:UIVersionedContent>
+</asp:ContentPlaceHolder>
+
+<!-- CSS стили для эффектов при наведении (добавить в head или в отдельный CSS файл) -->
+<style type="text/css">
+.custom-question-link:hover, .custom-question-link-v4:hover {
+    color: #cc0000 !important;
+    text-decoration: underline !important;
+    background-color: #f9f9f9;
+    border-radius: 3px;
+    padding: 3px !important;
+}
+
+/* Плавные переходы */
+.custom-question-link, .custom-question-link-v4 {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Убираем возможные конфликты с шириной */
+.custom-question-link, .custom-question-link-v4 {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+</style>
+
+АЛЬТЕРНАТИВНЫЙ ВАРИАНТ (если нужно еще больше отступа сверху):
+
+Если вы хотите, чтобы раздел был еще ниже, измените padding-top в строках:
+- Для UIVersion 3: <tr><td style="padding-top: 25px;"> (вместо 15px)
+- Для UIVersion 4: <li style="border-top: 1px solid #c6c6c6; margin-top: 20px; padding-top: 12px;"> (вместо 10px и 8px)
+
+ОБЪЯСНЕНИЕ ИСПРАВЛЕНИЙ:
+
+1. ✅ Убрано абсолютное позиционирование - теперь элемент в потоке документа
+2. ✅ Интегрировано в существующую структуру SharePoint
+3. ✅ Сохранены все стили и эффекты (иконки, hover-эффекты, размер шрифта)
+4. ✅ Добавлен визуальный разделитель (border-top)
+5. ✅ Правильная ширина - не выходит за границы панели
+6. ✅ Поддержка обеих версий UI
+
+ВАЖНЫЕ ИЗМЕНЕНИЯ:
+- Теперь раздел является частью обычной структуры навигации
+- Не влияет на ширину панели
+- Остается внизу, но корректно вписывается в layout
+- Все hover-эффекты и стили сохранены
