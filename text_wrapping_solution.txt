@@ -1,0 +1,108 @@
+РЕШЕНИЕ ПРОБЛЕМЫ С ПЕРЕНОСОМ ТЕКСТА:
+
+Проблема: У вас есть `nowrap` в td элементе, который блокирует перенос текста, и таблица с width="100%" не позволяет правильно работать с фиксированной шириной.
+
+ЗАМЕНИТЕ ваш текущий customQuestionContainer на этот код:
+
+<div id="customQuestionContainer" style="position: absolute; bottom: 10px; left: 4px; width: 140px; z-index: 100;">
+    <div style="border-top: 1px solid #c6c6c6; padding-top: 8px; padding-left: 0px; padding-right: 0px;">
+        <SharePoint:UIVersionedContent UIVersion="3" runat="server">
+        <ContentTemplate>
+            <div style="width: 140px; word-wrap: break-word; overflow-wrap: break-word;">
+                <a href="mailto:dl-a@s.ru?subject=Вопросы%20и%20предложения&body=Здравствуйте!%0A%0AУ%20меня%20есть%20вопрос/предложение:%0A%0A" 
+                   class="custom-question-link"
+                   style="color: #003399; text-decoration: none; font-size: 11px; font-weight: bold; font-family: verdana,arial,helvetica,sans-serif; display: block; padding: 3px 0; white-space: normal; line-height: 14px; word-wrap: break-word;">
+                   &#x2709; Вопросы и предложения
+                </a>
+            </div>
+        </ContentTemplate>
+        </SharePoint:UIVersionedContent>
+        <SharePoint:UIVersionedContent UIVersion="4" runat="server">
+        <ContentTemplate>
+            <div style="width: 140px; word-wrap: break-word; overflow-wrap: break-word;">
+                <a href="mailto:dl-a@s.ru?subject=Вопросы%20и%20предложения&body=Здравствуйте!%0A%0AУ%20меня%20есть%20вопрос/предложение:%0A%0A" 
+                   class="custom-question-link-v4"
+                   style="color: #0072bc; text-decoration: none; font-size: 11px; font-weight: bold; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; display: block; padding: 3px 0; white-space: normal; line-height: 14px; word-wrap: break-word;">
+                   &#x2709; Вопросы и предложения
+                </a>
+            </div>
+        </ContentTemplate>
+        </SharePoint:UIVersionedContent>
+    </div>
+</div>
+
+АЛЬТЕРНАТИВНЫЙ ВАРИАНТ (если нужна еще меньшая ширина):
+
+<div id="customQuestionContainer" style="position: absolute; bottom: 10px; left: 4px; width: 120px; z-index: 100;">
+    <div style="border-top: 1px solid #c6c6c6; padding-top: 8px;">
+        <SharePoint:UIVersionedContent UIVersion="3" runat="server">
+        <ContentTemplate>
+            <div style="width: 120px; word-wrap: break-word; overflow-wrap: break-word; hyphens: auto;">
+                <a href="mailto:dl-a@s.ru?subject=Вопросы%20и%20предложения&body=Здравствуйте!%0A%0AУ%20меня%20есть%20вопрос/предложение:%0A%0A" 
+                   class="custom-question-link"
+                   style="color: #003399; text-decoration: none; font-size: 10px; font-weight: bold; font-family: verdana,arial,helvetica,sans-serif; display: block; padding: 2px 0; white-space: normal; line-height: 12px; word-wrap: break-word; hyphens: auto;">
+                   &#x2709; Вопросы и предложения
+                </a>
+            </div>
+        </ContentTemplate>
+        </SharePoint:UIVersionedContent>
+        <SharePoint:UIVersionedContent UIVersion="4" runat="server">
+        <ContentTemplate>
+            <div style="width: 120px; word-wrap: break-word; overflow-wrap: break-word; hyphens: auto;">
+                <a href="mailto:dl-a@s.ru?subject=Вопросы%20и%20предложения&body=Здравствуйте!%0A%0AУ%20меня%20есть%20вопрос/предложение:%0A%0A" 
+                   class="custom-question-link-v4"
+                   style="color: #0072bc; text-decoration: none; font-size: 10px; font-weight: bold; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; display: block; padding: 2px 0; white-space: normal; line-height: 12px; word-wrap: break-word; hyphens: auto;">
+                   &#x2709; Вопросы и предложения
+                </a>
+            </div>
+        </ContentTemplate>
+        </SharePoint:UIVersionedContent>
+    </div>
+</div>
+
+ВАРИАНТ С СОКРАЩЕННЫМ ТЕКСТОМ (самый компактный):
+
+<div id="customQuestionContainer" style="position: absolute; bottom: 10px; left: 4px; width: 110px; z-index: 100;">
+    <div style="border-top: 1px solid #c6c6c6; padding-top: 8px;">
+        <SharePoint:UIVersionedContent UIVersion="3" runat="server">
+        <ContentTemplate>
+            <div style="width: 110px; word-wrap: break-word;">
+                <a href="mailto:dl-a@s.ru?subject=Вопросы%20и%20предложения&body=Здравствуйте!%0A%0AУ%20меня%20есть%20вопрос/предложение:%0A%0A" 
+                   class="custom-question-link"
+                   style="color: #003399; text-decoration: none; font-size: 10px; font-weight: bold; font-family: verdana,arial,helvetica,sans-serif; display: block; padding: 2px 0; white-space: normal; line-height: 12px; word-wrap: break-word;">
+                   &#x2709; Вопросы и предложения
+                </a>
+            </div>
+        </ContentTemplate>
+        </SharePoint:UIVersionedContent>
+        <SharePoint:UIVersionedContent UIVersion="4" runat="server">
+        <ContentTemplate>
+            <div style="width: 110px; word-wrap: break-word;">
+                <a href="mailto:dl-a@s.ru?subject=Вопросы%20и%20предложения&body=Здравствуйте!%0A%0AУ%20меня%20есть%20вопрос/предложение:%0A%0A" 
+                   class="custom-question-link-v4"
+                   style="color: #0072bc; text-decoration: none; font-size: 10px; font-weight: bold; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; display: block; padding: 2px 0; white-space: normal; line-height: 12px; word-wrap: break-word;">
+                   &#x2709; Вопросы и предложения
+                </a>
+            </div>
+        </ContentTemplate>
+        </SharePoint:UIVersionedContent>
+    </div>
+</div>
+
+КЛЮЧЕВЫЕ ИЗМЕНЕНИЯ:
+
+1. ✅ Убрана таблица - используется div вместо table/td
+2. ✅ Убран nowrap из td (который блокировал перенос)
+3. ✅ Добавлен word-wrap: break-word для принудительного переноса
+4. ✅ Добавлен overflow-wrap: break-word для современных браузеров
+5. ✅ Добавлен hyphens: auto для переноса с дефисами (во втором варианте)
+6. ✅ Уменьшен размер шрифта для более компактного отображения
+7. ✅ Добавлен line-height для контроля межстрочного интервала
+
+РЕКОМЕНДУЕМАЯ ПОСЛЕДОВАТЕЛЬНОСТЬ:
+
+1. Попробуйте первый вариант (140px)
+2. Если не помещается - второй вариант (120px) 
+3. Если все еще не помещается - третий вариант (110px)
+
+Основная проблема была в том, что таблица с nowrap не позволяла тексту переноситься. Теперь div с word-wrap должен корректно переносить текст на новые строки.
