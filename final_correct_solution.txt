@@ -1,0 +1,142 @@
+ПРАВИЛЬНОЕ РЕШЕНИЕ для default.master:
+
+Найдите в коде эти закрывающие теги в самом конце:
+
+</div>
+</td>
+
+И замените на:
+
+<!-- Кастомный раздел "Вопросы и предложения" внизу главного контейнера -->
+<div id="customQuestionContainer" style="position: absolute; bottom: 10px; left: 10px; right: 10px; z-index: 100;">
+    <div style="border-top: 1px solid #c6c6c6; padding-top: 8px; background: white; padding-left: 4px; padding-right: 4px;">
+        <SharePoint:UIVersionedContent UIVersion="3" runat="server">
+        <ContentTemplate>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tbody>
+            <tr><td nowrap="nowrap" style="padding: 2px 0;">
+                <a href="mailto:dl-a@s.ru?subject=Вопросы%20и%20предложения&body=Здравствуйте!%0A%0AУ%20меня%20есть%20вопрос/предложение:%0A%0A" 
+                   class="custom-question-link"
+                   style="color: #003399; text-decoration: none; font-size: 13px; font-weight: bold; font-family: verdana,arial,helvetica,sans-serif; display: block; padding: 3px 0;">
+                   &#x2709; Вопросы и предложения
+                </a>
+            </td></tr>
+            </tbody>
+            </table>
+        </ContentTemplate>
+        </SharePoint:UIVersionedContent>
+        <SharePoint:UIVersionedContent UIVersion="4" runat="server">
+        <ContentTemplate>
+            <div style="padding: 2px 0;">
+                <a href="mailto:dl-a@s.ru?subject=Вопросы%20и%20предложения&body=Здравствуйте!%0A%0AУ%20меня%20есть%20вопрос/предложение:%0A%0A" 
+                   class="custom-question-link-v4"
+                   style="color: #0072bc; text-decoration: none; font-size: 13px; font-weight: bold; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; display: block; padding: 3px 0;">
+                   &#x2709; Вопросы и предложения
+                </a>
+            </div>
+        </ContentTemplate>
+        </SharePoint:UIVersionedContent>
+    </div>
+</div>
+</div>
+</td>
+
+ТАКЖЕ нужно изменить стиль главного контейнера. Найдите строку:
+
+<td valign="top" width="100%">
+
+И замените на:
+
+<td valign="top" width="100%" style="position: relative; height: 100%;">
+
+И найдите строку:
+
+<div style="padding-top:1px">
+
+И замените на:
+
+<div style="padding-top:1px; padding-bottom: 50px; min-height: 100%; box-sizing: border-box;">
+
+CSS СТИЛИ (добавить в head):
+
+<style type="text/css">
+/* Простые hover-эффекты без анимаций */
+.custom-question-link:hover, .custom-question-link-v4:hover {
+    color: #cc0000 !important;
+    text-decoration: underline !important;
+}
+
+/* Базовые стили */
+.custom-question-link, .custom-question-link-v4 {
+    cursor: pointer;
+}
+
+/* Обеспечиваем правильную высоту главного контейнера */
+.ms-leftareacell {
+    height: 100% !important;
+    position: relative !important;
+}
+
+#customQuestionContainer {
+    max-width: 160px;
+    box-sizing: border-box;
+}
+</style>
+
+АЛЬТЕРНАТИВНОЕ РЕШЕНИЕ (если абсолютное позиционирование не работает):
+
+Вместо абсолютного позиционирования используйте этот подход:
+
+Найдите закрывающие теги:
+</div>
+</td>
+
+И замените на:
+
+<!-- Spacer для выталкивания вниз -->
+<div style="height: 200px;"></div>
+
+<!-- Кастомный раздел "Вопросы и предложения" -->
+<div style="margin-top: 20px; padding: 8px 4px; border-top: 1px solid #c6c6c6; background: white;">
+    <SharePoint:UIVersionedContent UIVersion="3" runat="server">
+    <ContentTemplate>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tbody>
+        <tr><td nowrap="nowrap" style="padding: 2px 0;">
+            <a href="mailto:dl-a@s.ru?subject=Вопросы%20и%20предложения&body=Здравствуйте!%0A%0AУ%20меня%20есть%20вопрос/предложение:%0A%0A" 
+               class="custom-question-link"
+               style="color: #003399; text-decoration: none; font-size: 13px; font-weight: bold; font-family: verdana,arial,helvetica,sans-serif; display: block; padding: 3px 0;">
+               &#x2709; Вопросы и предложения
+            </a>
+        </td></tr>
+        </tbody>
+        </table>
+    </ContentTemplate>
+    </SharePoint:UIVersionedContent>
+    <SharePoint:UIVersionedContent UIVersion="4" runat="server">
+    <ContentTemplate>
+        <div style="padding: 2px 0;">
+            <a href="mailto:dl-a@s.ru?subject=Вопросы%20и%20предложения&body=Здравствуйте!%0A%0AУ%20меня%20есть%20вопрос/предложение:%0A%0A" 
+               class="custom-question-link-v4"
+               style="color: #0072bc; text-decoration: none; font-size: 13px; font-weight: bold; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; display: block; padding: 3px 0;">
+               &#x2709; Вопросы и предложения
+            </a>
+        </div>
+    </ContentTemplate>
+    </SharePoint:UIVersionedContent>
+</div>
+</div>
+</td>
+
+ОБЪЯСНЕНИЕ РЕШЕНИЯ:
+
+1. ✅ Главный контейнер: <td valign="top" width="100%"> получает position: relative
+2. ✅ Внутренний div получает padding-bottom: 50px для резервирования места
+3. ✅ Кастомный блок позиционируется абсолютно внизу (bottom: 10px)
+4. ✅ Альтернатива: spacer div высотой 200px выталкивает элемент вниз
+5. ✅ Простые стили: только смена цвета и подчеркивание при hover
+6. ✅ Только иконка письма &#x2709;
+7. ✅ Белый фон для лучшей видимости
+
+РЕКОМЕНДАЦИЯ:
+Попробуйте сначала основное решение с абсолютным позиционированием. Если не работает - используйте альтернативное с spacer div.
