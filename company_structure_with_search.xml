@@ -335,6 +335,8 @@ dropdown.appendChild(div);
 
 // Навигация к выбранному элементу
 function navigateToItem(item) {
+console.log('Navigating to item:', item); // Отладочная информация
+
 // Сначала закрываем все открытые блоки
 $('.block.division > .division-inner-container > ul').hide();
 $('.block.division').removeClass('open');
@@ -342,54 +344,80 @@ $('.block.department > .department-inner-container > ul').hide();
 $('.block.department').removeClass('open');
 
 const [directorate, division, department] = item.path;
+console.log('Path:', directorate, division, department); // Отладочная информация
 
 if (item.type === 'division' && division) {
 // Находим и открываем департамент
-const divisionBlock = $(`.block.division:contains('${division}')`).filter(function() {
-return $(this).text().trim() === division;
+const divisionBlocks = $('.block.division').filter(function() {
+const titleText = $(this).children('span').first().text().trim();
+console.log('Checking division:', titleText, 'against:', division);
+return titleText === division;
 });
 
-if (divisionBlock.length > 0) {
+console.log('Found division blocks:', divisionBlocks.length);
+
+if (divisionBlocks.length > 0) {
+const divisionBlock = divisionBlocks.first();
 const divisionUl = divisionBlock.find('.division-inner-container > ul');
 divisionUl.show();
 divisionBlock.addClass('open');
 // Прокручиваем к элементу
 divisionBlock[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+console.log('Division opened successfully');
 }
 } else if (item.type === 'department' && department) {
 // Находим и открываем департамент, затем отдел
-const divisionBlock = $(`.block.division:contains('${division}')`).filter(function() {
-return $(this).text().trim() === division;
+const divisionBlocks = $('.block.division').filter(function() {
+const titleText = $(this).children('span').first().text().trim();
+return titleText === division;
 });
 
-if (divisionBlock.length > 0) {
+console.log('Found division blocks for department:', divisionBlocks.length);
+
+if (divisionBlocks.length > 0) {
+const divisionBlock = divisionBlocks.first();
 const divisionUl = divisionBlock.find('.division-inner-container > ul');
 divisionUl.show();
 divisionBlock.addClass('open');
 
 // Находим и открываем отдел
 setTimeout(() => {
-const departmentBlock = divisionBlock.find(`.block.department:contains('${department}')`).filter(function() {
-return $(this).text().trim() === department;
+const departmentBlocks = divisionBlock.find('.block.department').filter(function() {
+// Получаем только первый текстовый узел (название отдела)
+const titleText = $(this).contents().filter(function() {
+return this.nodeType === 3; // текстовый узел
+}).text().trim();
+console.log('Checking department:', titleText, 'against:', department);
+return titleText === department;
 });
 
-if (departmentBlock.length > 0) {
+console.log('Found department blocks:', departmentBlocks.length);
+
+if (departmentBlocks.length > 0) {
+const departmentBlock = departmentBlocks.first();
 const departmentUl = departmentBlock.find('.department-inner-container > ul');
 departmentUl.show();
 departmentBlock.addClass('open');
 // Прокручиваем к элементу
 departmentBlock[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+console.log('Department opened successfully');
 }
-}, 100);
+}, 200);
 }
 } else if (item.type === 'directorate') {
 // Прокручиваем к дирекции
-const directorateBlock = $(`.block.directorate:contains('${directorate}')`).filter(function() {
-return $(this).find('span').first().text().trim() === directorate;
+const directorateBlocks = $('.block.directorate').filter(function() {
+const titleText = $(this).find('span').first().text().trim();
+console.log('Checking directorate:', titleText, 'against:', directorate);
+return titleText === directorate;
 });
 
-if (directorateBlock.length > 0) {
+console.log('Found directorate blocks:', directorateBlocks.length);
+
+if (directorateBlocks.length > 0) {
+const directorateBlock = directorateBlocks.first();
 directorateBlock[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+console.log('Directorate scrolled to successfully');
 }
 }
 }
