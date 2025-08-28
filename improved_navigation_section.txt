@@ -1,0 +1,140 @@
+УЛУЧШЕННЫЙ КОД для default.master:
+
+Замените весь блок PlaceHolderQuickLaunchBottom на следующий код:
+
+<asp:ContentPlaceHolder id="PlaceHolderQuickLaunchBottom" runat="server">
+<SharePoint:UIVersionedContent UIVersion="3" runat="server" id="PlaceHolderQuickLaunchBottomV3">
+<ContentTemplate>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" class="s4-die">
+<tbody>
+<tr><td>
+<table class="ms-recyclebin" width="100%" cellpadding="0" cellspacing="0" border="0">
+<tbody>
+<tr><td nowrap="nowrap">
+<SharePoint:SPLinkButton runat="server" NavigateUrl="~site/_layouts/recyclebin.aspx" id="v3idNavLinkRecycleBin" ImageUrl="/_layouts/images/recycbin.gif" Text="<%$Resources:wss,StsDefault_RecycleBin%>" PermissionsString="DeleteListItems" />
+</td></tr>
+</table>
+</td></tr>
+</table>
+</ContentTemplate>
+</SharePoint:UIVersionedContent>
+<SharePoint:UIVersionedContent UIVersion="4" runat="server" id="PlaceHolderQuickLaunchBottomV4">
+<ContentTemplate>
+<ul class="s4-specialNavLinkList">
+<li>
+<SharePoint:ClusteredSPLinkButton
+runat="server"
+NavigateUrl="~site/_layouts/recyclebin.aspx"
+ImageClass="s4-specialNavIcon"
+ImageUrl="/_layouts/images/fgimg.png"
+ImageWidth=16
+ImageHeight=16
+OffsetX=0
+OffsetY=428
+id="idNavLinkRecycleBin"
+Text="<%$Resources:wss,StsDefault_RecycleBin%>"
+CssClass="s4-rcycl"
+PermissionsString="DeleteListItems" />
+</li>
+<li>
+<SharePoint:ClusteredSPLinkButton
+id="idNavLinkViewAllV4"
+runat="server"
+PermissionsString="ViewFormPages"
+NavigateUrl="~site/_layouts/viewlsts.aspx"
+ImageClass="s4-specialNavIcon"
+ImageUrl="/_layouts/images/fgimg.png"
+ImageWidth=16
+ImageHeight=16
+OffsetX=0
+OffsetY=0
+Text="<%$Resources:wss,quiklnch_allcontent_short%>"
+accesskey="<%$Resources:wss,quiklnch_allcontent_AK%>"/>
+</li>
+</ul>
+</ContentTemplate>
+</SharePoint:UIVersionedContent>
+</asp:ContentPlaceHolder>
+
+А ЗАТЕМ добавьте этот блок СРАЗУ ПОСЛЕ закрывающего тега </asp:ContentPlaceHolder> (но ДО закрывающего </td>):
+
+<!-- Кастомный раздел "Вопросы и предложения" с выравниванием по низу -->
+<div style="position: absolute; bottom: 10px; left: 10px; right: 10px;">
+    <div style="border-top: 1px solid #c6c6c6; padding-top: 8px; margin-top: 10px;">
+        <SharePoint:UIVersionedContent UIVersion="3" runat="server">
+        <ContentTemplate>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tbody>
+            <tr><td nowrap="nowrap" style="padding: 5px 0;">
+                <a href="mailto:dl-a@s.ru?subject=Вопросы%20и%20предложения&body=Здравствуйте!%0A%0AУ%20меня%20есть%20вопрос/предложение:%0A%0A" 
+                   id="customQuestionLink"
+                   style="color: #003399; text-decoration: none; font-size: 13px; font-weight: bold; font-family: verdana,arial,helvetica,sans-serif; display: block; padding: 3px;">
+                   &#x2709; &#x2753; Вопросы и предложения
+                </a>
+            </td></tr>
+            </tbody>
+            </table>
+        </ContentTemplate>
+        </SharePoint:UIVersionedContent>
+        <SharePoint:UIVersionedContent UIVersion="4" runat="server">
+        <ContentTemplate>
+            <div style="padding: 5px 0;">
+                <a href="mailto:dl-a@s.ru?subject=Вопросы%20и%20предложения&body=Здравствуйте!%0A%0AУ%20меня%20есть%20вопрос/предложение:%0A%0A" 
+                   id="customQuestionLinkV4"
+                   style="color: #0072bc; text-decoration: none; font-size: 13px; font-weight: bold; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; display: block; padding: 3px;">
+                   &#x2709; &#x2753; Вопросы и предложения
+                </a>
+            </div>
+        </ContentTemplate>
+        </SharePoint:UIVersionedContent>
+    </div>
+</div>
+
+<!-- CSS стили для эффектов при наведении -->
+<style type="text/css">
+#customQuestionLink:hover, #customQuestionLinkV4:hover {
+    color: #cc0000 !important;
+    text-decoration: underline !important;
+    background-color: #f9f9f9;
+    border-radius: 3px;
+}
+
+/* Дополнительные стили для лучшего отображения */
+#customQuestionLink, #customQuestionLinkV4 {
+    transition: all 0.2s ease-in-out;
+}
+</style>
+
+АЛЬТЕРНАТИВНЫЙ ВАРИАНТ с другими иконками (если не нравятся символы выше):
+
+Замените строку с иконками на одну из следующих:
+
+Вариант 1 (конверт + вопрос):
+&#x2709; &#x2753; Вопросы и предложения
+
+Вариант 2 (только конверт):
+&#x2709; Вопросы и предложения
+
+Вариант 3 (стрелка + конверт):
+&#x27A4; &#x2709; Вопросы и предложения
+
+Вариант 4 (телефон + конверт):
+&#x260E; &#x2709; Вопросы и предложения
+
+Вариант 5 (восклицательный знак + конверт):
+&#x2757; &#x2709; Вопросы и предложения
+
+ОБЪЯСНЕНИЕ ИЗМЕНЕНИЙ:
+
+1. ✅ HTML-иконки: Добавлены символы &#x2709; (конверт) и &#x2753; (вопрос)
+2. ✅ Увеличенный шрифт: font-size: 13px и font-weight: bold
+3. ✅ Эффекты при наведении: красный цвет (#cc0000) и подчеркивание
+4. ✅ Позиционирование внизу: position: absolute; bottom: 10px
+5. ✅ Разделитель: border-top для визуального отделения
+6. ✅ Плавные переходы: transition для smooth эффектов
+
+ВАЖНО: 
+- Блок теперь располагается абсолютно внизу контейнера левой панели
+- Добавлен визуальный разделитель (линия сверху)
+- Поддерживаются обе версии UI SharePoint
+- CSS стили обеспечивают красивые hover-эффекты
